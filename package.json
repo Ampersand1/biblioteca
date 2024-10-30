@@ -1,0 +1,12 @@
+{
+  "name": "biblioteca",
+  "version": "1.0.0",
+  "description": "Este es una web para bibliotecas clásicas, en la que los usuarios podrán ver la disponibilidad de algún libro que buscan y hacer reservas.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
