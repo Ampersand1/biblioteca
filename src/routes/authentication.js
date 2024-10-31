@@ -56,8 +56,8 @@ router.put("/usuarios/:id", async (req, res) => {
             return res.status(401).json({ error: "Contraseña incorrecta" });
         }
 
-        if (usuario) user.usuario = usuario; 
-        if (correo) user.correo = correo;   
+        if (usuario) user.usuario = usuario;
+        if (correo) user.correo = correo;
 
         if (nuevaClave) {
             user.clave = await user.encryptClave(nuevaClave);
@@ -70,6 +70,16 @@ router.put("/usuarios/:id", async (req, res) => {
     }
 });
 
+router.delete("/usuarios/:id", (req, res) => {
+    const { id } = req.params;
+    userSchema.findByIdAndDelete(id)
+        .then((data) => {
+            res.json(data);
+        })
+        .catch((error) => {
+            res.json({ message: error });
+        });
+});
 
 
 module.exports = router;
