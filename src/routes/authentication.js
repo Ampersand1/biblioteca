@@ -26,12 +26,19 @@ router.post('/signup', async (req, res) => {
         res.status(500).json({ error: "Error al registrar el usuario" });
     }
 
-    router.get("/usuarios", (req, res) => {
-        userSchema.find()
-            .then((data) => res.json(data))
-            .catch((error) => res.json({ message: error }));
-    });
+});
 
+router.get("/usuarios", (req, res) => {
+    userSchema.find()
+        .then((data) => res.json(data))
+        .catch((error) => res.json({ message: error }));
+});
+
+router.get("/usuarios/:id", (req, res) => {
+    const { id } = req.params;
+    userSchema.findById(id)
+        .then((data) => res.json(data))
+        .catch((error) => res.json({ message: error }));
 });
 
 module.exports = router;
