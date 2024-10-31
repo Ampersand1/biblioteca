@@ -27,7 +27,7 @@ router.post('/signup', async (req, res) => {
     }
 
     router.get("/usuarios", (req, res) => {
-        animalSchema.find()
+        userSchema.find()
             .then((data) => res.json(data))
             .catch((error) => res.json({ message: error }));
     });
