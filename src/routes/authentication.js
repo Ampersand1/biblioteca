@@ -1,6 +1,8 @@
 const express = require("express");
+const bcrypt = require("bcrypt");
 const router = express.Router();
 const userSchema = require("../models/usuario");
+const usuario = require("../models/usuario");
 
 //singup para usuario 
 router.post('/signup', async (req, res) => {
@@ -32,6 +34,26 @@ router.post('/signup', async (req, res) => {
 //singup para administrador (con un método para )
 
 //login para todos los usuarios (evalua si es admin o usuario)
+
+router.post("/login", async (req, res) => {
+    // validaciones
+    const { error } = userSchema.validate(req.body.usuario, req.body.clave);
+    if (error) return res.status(400).json({ error: error.details[0].message });
+    //Buscando el usuario por su usuario
+    const user = await userSchema.findOne({ usuario: req.body.usuario });
+    //validando si no se encuentra
+    if (!user) return res.status(400).json({ error: "Usuario no encontrado" });
+    //Transformando la contraseña a su valor original para 
+    //compararla con la clave que se ingresa en el inicio de sesión
+    const validPassword = await bcrypt.compare(req.body.clave, user.clave);
+    if (!validPassword)
+        return res.status(400).json({ error: "Contraseña incorrecta" });
+    res.json({
+        error: null,
+        data: "Bienvenido(a) a la biblioteca",
+    });
+});
+
 
 module.exports = router;
 
