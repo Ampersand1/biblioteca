@@ -13,16 +13,28 @@ router.post('/signup', async (req, res) => {
         return res.status(400).json({ error: "Las contraseñas no coinciden" });
     }
 
-    const user = new userSchema({
-        usuario: usuario,
-        correo: correo,
-        clave: clave
-    });
-
-    // Encriptar la contraseña
-    user.clave = await user.encryptClave(user.clave);
-
     try {
+        // Se hace la verificación para ver si el usuario ya existe
+        const usuarioExistente = await userSchema.findOne({ usuario });
+        if (usuarioExistente) {
+            return res.status(400).json({ error: "El nombre de usuario ya está en uso" });
+        }
+
+        // Se hace la verificación para ver si el correo ya existe
+        const correoExistente = await userSchema.findOne({ correo });
+        if (correoExistente) {
+            return res.status(400).json({ error: "El correo ya está en uso" });
+        }
+
+        const user = new userSchema({
+            usuario,
+            correo,
+            clave
+        });
+
+        // Se encripta la contraseña del usuario
+        user.clave = await user.encryptClave(user.clave);
+
         await user.save();
 
         const token = jwt.sign({ id: user._id }, process.env.SECRET, {
@@ -39,6 +51,7 @@ router.post('/signup', async (req, res) => {
         return res.status(500).json({ error: "Error al registrar el usuario" });
     }
 });
+
 
 
 //singup para administrador (con un método para )
