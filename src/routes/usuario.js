@@ -134,4 +134,22 @@ router.delete("/usuariostodos", async (req, res) => {
     }
 });
 
+// Método -SOLO DESARROLLO- para borrar a un administrador por su ID 
+router.delete("/usuarios/borrar/:id", async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const user = await userSchema.findById(id);
+        if (!user) {
+            return res.status(404).json({ error: "Usuario no encontrado" });
+        }
+
+        await userSchema.findByIdAndDelete(id);
+        res.json({ message: "Usuario eliminado con éxito" });
+    } catch (error) {
+        res.status(500).json({ error: "Error al eliminar el usuario" });
+    }
+});
+
+
 module.exports = router;
