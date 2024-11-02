@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken')
 //y si el usuario tiene permiso para acceder
 //En el servidor se va a recibir así:
 //access-token
-//metodo verifyToken
+//Middleware verifyToken
 const verifyToken = (req, res, next) => {
     const token = req.header('access-token')
     if (!token) return res.status(401).json({ error: '¡Lo sentimos!, pero no tiene permisos para acceder a esta ruta.' })
@@ -16,6 +16,21 @@ const verifyToken = (req, res, next) => {
     }
 }
 
-//metodo verifyAdmin
+// Middleware verifyAdmin para verificar el rol de administrador
+const verifyAdmin = (req, res, next) => {
+    const token = req.header('access-token');
+    if (!token) return res.status(401).json({ error: 'No tiene permisos para acceder a esta ruta' });
 
-module.exports = verifyToken;
+    try {
+        const verified = jwt.verify(token, process.env.SECRET);
+        if (verified.rol !== 'admin') {
+            return res.status(403).json({ error: 'Acceso denegado. Solo administradores pueden acceder a esta ruta' });
+        }
+        req.user = verified;
+        next();
+    } catch (error) {
+        res.status(400).json({ error: 'Token no válido' });
+    }
+};
+
+module.exports = {verifyToken, verifyAdmin};

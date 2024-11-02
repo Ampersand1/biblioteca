@@ -15,8 +15,11 @@ const userSchema = new mongoose.Schema({
     clave: {
         type: String,
         required: true
-    }
-
+    },
+    rol: { 
+        type: String, 
+        enum: ["usuario", "admin"], 
+        default: "usuario" } 
 });
 userSchema.methods.encryptClave = async (clave) => {
     const salt = await bcrypt.genSalt(10);
