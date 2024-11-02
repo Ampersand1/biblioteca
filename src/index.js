@@ -3,11 +3,14 @@ const express = require('express');
 const app = express();
 const port = 3000;
 const authRoutes = require("./routes/authentication");
+const usuarioRoutes = require("./routes/usuario");
 const mongoose = require("mongoose");
 require('dotenv').config();
+
 app.use(parser.urlencoded({ extended: false }));
 app.use(parser.json());
 app.use("/api", authRoutes);
+app.use("/api", usuarioRoutes);
 app.use(express.json());
 
 mongoose
@@ -16,5 +19,5 @@ mongoose
     .catch((error) => console.log(error));
 
     app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
-});
+    console.log(`Escuchando desde el puerto ${port}`)
+    });
