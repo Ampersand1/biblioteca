@@ -81,5 +81,57 @@ router.delete("/usuarios", verifyToken, async (req, res) => {
     }
 });
 
+//Método -SOLO PARA EL DESARROLLO- para obtener a TODOS los usuarios (NO USAR EN LA APP)
+router.get("/usuariostodos", async (req, res) => {
+    try {
+        const usuarios = await userSchema.find(); // Obtiene todos los usuarios de la base de datos
+        res.json(usuarios);
+    } catch (error) {
+        res.status(500).json({ error: "Error al obtener los usuarios" });
+    }
+});
+//Método -SOLO PARA EL DESARROLLO- para borrar a TODOS los usuarios ADMIN (NO USAR EN LA APP)
+// Método para eliminar todos los usuarios con rol de admin (accesible solo para administradores)
+router.delete("/usuarios/admins", async (req, res) => {
+    try {
+        const resultado = await userSchema.deleteMany({ rol: 'admin' }); // Elimina todos los usuarios con rol 'admin'
+        
+        if (resultado.deletedCount === 0) {
+            return res.status(404).json({ message: "No se encontraron usuarios administradores para eliminar." });
+        }
+
+        res.json({ message: "Todos los usuarios administradores han sido eliminados con éxito." });
+    } catch (error) {
+        res.status(500).json({ error: "Error al eliminar usuarios administradores." });
+    }
+});
+//Método -SOLO PARA EL DESARROLLO- para borrar a TODOS los usuarios USUARIO (NO USAR EN LA APP)
+router.delete("/usuarios/usuarios", async (req, res) => {
+    try {
+        const resultado = await userSchema.deleteMany({ rol: 'usuario' }); // Elimina todos los usuarios con rol 'admin'
+        
+        if (resultado.deletedCount === 0) {
+            return res.status(404).json({ message: "No se encontraron usuarios para eliminar." });
+        }
+
+        res.json({ message: "Todos los usuarios han sido eliminados con éxito." });
+    } catch (error) {
+        res.status(500).json({ error: "Error al eliminar usuarios." });
+    }
+});
+//Método -SOLO PARA EL DESARROLLO- para borrar a TODOS los usuarios (NO USAR EN LA APP)
+router.delete("/usuariostodos", async (req, res) => {
+    try {
+        const resultado = await userSchema.deleteMany({}); // Elimina todos los usuarios
+
+        if (resultado.deletedCount === 0) {
+            return res.status(404).json({ message: "No se encontraron usuarios para eliminar." });
+        }
+
+        res.json({ message: "Todos los usuarios han sido eliminados con éxito." });
+    } catch (error) {
+        res.status(500).json({ error: "Error al eliminar usuarios." });
+    }
+});
 
 module.exports = router;

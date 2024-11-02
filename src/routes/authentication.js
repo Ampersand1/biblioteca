@@ -4,7 +4,6 @@ const jwt = require("jsonwebtoken");
 const router = express.Router();
 const userSchema = require("../models/usuario");
 const usuario = require("../models/usuario");
-const { verifyToken, verifyAdmin } = require('./authorization');
 
 //singup para usuario 
 router.post('/signup', async (req, res) => {
@@ -52,7 +51,6 @@ router.post('/signup', async (req, res) => {
         return res.status(500).json({ error: "Error al registrar el usuario" });
     }
 });
-
 
 
 // Método signupAdmin para el registro de administradores
@@ -111,34 +109,43 @@ router.post('/signupadmin', async (req, res) => {
 
 //login para todos los usuarios 
 
-router.post("/login", verifyToken, async (req, res) => {
-    const { error } = userSchema.validate(req.body.usuario, req.body.clave);
-    if (error) return res.status(400).json({ error: error.details[0].message });
-    const user = await userSchema.findOne({ usuario: req.body.usuario });
-    if (!user) return res.status(400).json({ error: "Usuario no encontrado" });
-    const validPassword = await bcrypt.compare(req.body.clave, user.clave);
-    if (!validPassword)
-        return res.status(400).json({ error: "Contraseña incorrecta" });
-    res.json({
-        error: null,
-        data: "Bienvenido(a) a la biblioteca",
-    });
+router.post("/login", async (req, res) => {
+    // Obtener usuario y clave del cuerpo de la solicitud
+    const { usuario, clave } = req.body;
+    const nombreUsuario = req.body.usuario;
+    // Comprobar que se proporcionó al menos uno de los campos (usuario o correo) y la clave
+    if (!usuario || !clave) {
+        return res.status(400).json({ error: "El nombre de usuario/correo y la contraseña son requeridos." });
+    }
+
+    try {
+        // Buscar el usuario en la base de datos por usuario o correo
+        const user = await userSchema.findOne({
+            $or: [{ usuario }, { correo: usuario }] // Verifica si el campo corresponde al usuario o al correo
+        });
+
+        if (!user) return res.status(400).json({ error: "Usuario no encontrado" });
+
+        // Verificar la contraseña
+        const validPassword = await bcrypt.compare(clave, user.clave);
+        if (!validPassword) return res.status(400).json({ error: "Contraseña incorrecta" });
+
+        // Generar un token para el usuario
+        const token = jwt.sign({ id: user._id, rol: user.rol }, process.env.SECRET, {
+            expiresIn: 60 * 60 * 24, // un día en segundos
+        });
+
+        // Respuesta exitosa con el token
+        res.status(200).json({
+            message: "Bienvenido(a) a la biblioteca "+nombreUsuario,
+            auth: true,
+            token,
+        });
+    } catch (error) {
+        res.status(500).json({ error: "Error al iniciar sesión" });
+    }
 });
 
-//login para adminsitradores
-router.post("/loginAdmin", verifyToken, verifyAdmin, async (req, res) => {
-    const { error } = userSchema.validate(req.body.usuario, req.body.clave);
-    if (error) return res.status(400).json({ error: error.details[0].message });
-    const user = await userSchema.findOne({ usuario: req.body.usuario });
-    if (!user) return res.status(400).json({ error: "Usuario no encontrado" });
-    const validPassword = await bcrypt.compare(req.body.clave, user.clave);
-    if (!validPassword)
-        return res.status(400).json({ error: "Contraseña incorrecta" });
-    res.json({
-        error: null,
-        data: "Bienvenido(a) a la biblioteca",
-    });
-});
 
 module.exports = router;
 
