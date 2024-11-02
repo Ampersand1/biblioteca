@@ -1,5 +1,6 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const router = express.Router();
 const userSchema = require("../models/usuario");
 const usuario = require("../models/usuario");
@@ -7,7 +8,6 @@ const usuario = require("../models/usuario");
 //singup para usuario 
 router.post('/signup', async (req, res) => {
     const { usuario, correo, clave, confirmacionClave } = req.body;
-
 
     if (clave !== confirmacionClave) {
         return res.status(400).json({ error: "Las contraseñas no coinciden" });
@@ -24,12 +24,22 @@ router.post('/signup', async (req, res) => {
 
     try {
         await user.save();
-        res.json({ message: "Usuario registrado con éxito", user });
-    } catch (error) {
-        res.status(500).json({ error: "Error al registrar el usuario" });
-    }
 
+        const token = jwt.sign({ id: user._id }, process.env.SECRET, {
+            expiresIn: 60 * 60 * 24, // un día en segundos
+        });
+
+        return res.json({
+            message: "Usuario registrado con éxito",
+            auth: true,
+            token,
+            user
+        });
+    } catch (error) {
+        return res.status(500).json({ error: "Error al registrar el usuario" });
+    }
 });
+
 
 //singup para administrador (con un método para )
 
@@ -48,7 +58,6 @@ router.post("/login", async (req, res) => {
         data: "Bienvenido(a) a la biblioteca",
     });
 });
-
 
 module.exports = router;
 

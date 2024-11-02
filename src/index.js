@@ -18,6 +18,6 @@ mongoose
     .then(() => console.log("Conexión exitosa"))
     .catch((error) => console.log(error));
 
-    app.listen(port, () => {
+app.listen(port, () => {
     console.log(`Escuchando desde el puerto ${port}`)
-    });
+});

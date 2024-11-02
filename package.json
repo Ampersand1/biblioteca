@@ -15,6 +15,7 @@
     "biblioteca": "file:",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
+    "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.7.3",
     "moongose": "^1.0.0",
     "nodemon": "^3.1.7"
