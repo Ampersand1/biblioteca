@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const userSchema = require("../models/usuario");
-const { verifyToken, verifyAdmin } = require('./authorization').default;
+const { verifyToken, verifyAdmin } = require('./authorization');
 
 // Método para obtener solo los usuarios con rol de 'usuario' (accesible solo para administradores)
 router.get("/usuarios", verifyAdmin, verifyToken, (req, res) => {
