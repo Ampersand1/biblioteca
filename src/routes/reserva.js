@@ -40,7 +40,7 @@ router.post("/reservas/:inventarioId", verifyToken, async (req, res) => {
         }
 
         // Verificar que el libro esté disponible para reserva
-        const libroDisponible = await libroNoReservado();
+        const libroDisponible = await libroNoReservado(inventarioId);
         if (!libroDisponible) {
             return res.status(400).json({ message: "No hay ejemplares disponibles para reservar." });
         }
@@ -64,9 +64,17 @@ router.post("/reservas/:inventarioId", verifyToken, async (req, res) => {
 
         // Actualizar la cantidad de ejemplares disponibles
         try {
-            const actualizarlibro = await Inventario.findByIdAndUpdate(
+            // Decrementar la cantidad en inventario
+            await Inventario.findByIdAndUpdate(
                 inventarioId,
                 { $inc: { cantidad: -1 } }, // Decrecer la cantidad en 1
+                { new: true }
+            );
+
+            // Agregar el usuario al campo 'reservado' del libro
+            await Inventario.findByIdAndUpdate(
+                inventarioId,
+                { $push: { reservado: usuarioId } }, // Agregar el ID del usuario al arreglo de 'reservado'
                 { new: true }
             );
         } catch (error) {
