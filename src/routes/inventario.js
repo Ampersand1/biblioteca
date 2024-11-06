@@ -3,8 +3,16 @@ const router = express.Router();
 const inventarioSchema = require("../models/inventario");
 const inventario = require("../models/inventario");
 const { verifyToken, verifyAdmin } = require('./authorization');
+
 // Método para obtener todos los libros -SOLO PARA EL DESARROLLO-
-router.get("/inventario",verifyAdmin, verifyToken, (req, res) => {
+router.get("/inventario", (req, res) => {
+    inventarioSchema.find()
+        .then((data) => res.json(data))
+        .catch((error) => res.json({ message: error }));
+});
+
+//Obtener todos los libros
+router.get("/inventario/todos", (req, res) => {
     inventarioSchema.find()
         .then((data) => res.json(data))
         .catch((error) => res.json({ message: error }));
@@ -48,13 +56,27 @@ router.get("/inventario/buscar", verifyToken, async (req, res) => {
     }
 });
 //Nuevo Libro
-router.post("/inventario",verifyAdmin, verifyToken, (req, res) => {
-    const inventario = inventarioSchema(req.body);
-    inventario
-        .save()
-        .then((data) => res.json(data))
-        .catch((error) => res.json({ message: error }));
+router.post("/inventario", verifyAdmin, verifyToken, async (req, res) => {
+    const { nombre, isbn } = req.body;  // Asumimos que el libro tiene un 'nombre' o 'isbn' para verificar duplicados
+
+    try {
+        // Verificamos si el libro con el mismo ISBN o nombre ya existe
+        const libroExistente = await inventarioSchema.findOne({ $or: [{ isbn }, { nombre }] });
+
+        if (!libroExistente) {
+            return res.status(400).json({ message: "El libro ya existe en el inventario." });
+        }
+
+        // Si el libro no existe, lo guardamos
+        const inventario = new inventarioSchema(req.body);
+        const nuevoLibro = await inventario.save();
+        res.status(201).json(nuevoLibro);
+
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 });
+
 // Método para cambiar información de la referencia
 router.put("/inventario/:id", verifyAdmin, verifyToken, async (req, res) => {
     const { id } = req.params; // Obtener el ID desde los parámetros de la URL

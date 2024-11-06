@@ -3,7 +3,6 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const router = express.Router();
 const userSchema = require("../models/usuario");
-const usuario = require("../models/usuario");
 
 //singup para usuario 
 router.post('/signup', async (req, res) => {

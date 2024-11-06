@@ -27,6 +27,16 @@ const inventarioSchema = new mongoose.Schema({
     ISBN:{
         type: Number,
         required: true
-    }
+    },
+    cantidadDisponible: {
+        type: Number, 
+        required: true,
+        default: 1
+    }, 
+    reservado: [{
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: "Usuario"  
+    }]
+    
 });
 module.exports = mongoose.model('Inventario', inventarioSchema);
