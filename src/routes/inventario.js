@@ -15,8 +15,8 @@ router.get("/inventario/buscar", verifyAdmin, verifyToken, async (req, res) => {
 
     try {
         // Buscamos en la base de datos por 'nombre' o 'autor' 
-        const libro = await inventarioSchema.findOne({
-            $or: [{ nombre }, { autor }]
+        const inventario = await inventarioSchema.findOne({
+            $or: [{ Nombre: nombre }, { Autor: autor }]
         });
 
         if (!inventario) {
@@ -34,8 +34,8 @@ router.get("/inventario/buscar", verifyToken, async (req, res) => {
 
     try {
         // Buscamos en la base de datos por 'nombre' o 'autor' 
-        const libro = await inventarioSchema.findOne({
-            $or: [{ nombre }, { autor }]
+        const inventario = await inventarioSchema.findOne({
+            $or: [{ Nombre: nombre }, { Autor: autor }]
         });
 
         if (!inventario) {
