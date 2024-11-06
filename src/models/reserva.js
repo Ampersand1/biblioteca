@@ -3,12 +3,14 @@ const mongoose = require("mongoose");
 const reservaSchema = new mongoose.Schema({
     //Reserva relacionada a un usuario existente en la base de datos
     usuario: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Usuario",  // Ref a Usuario
         required: true
     },
     //libros de la reserva elegidos por el usuario
     libros: [{
-        type: mongoose.Schema.Types.ObjectId, ref: 'Libro',
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Inventario',  // Referencia a Inventario en lugar de "Libro"
         required: true
     }],
     fecha: {

@@ -10,6 +10,13 @@ router.get("/inventario", (req, res) => {
         .then((data) => res.json(data))
         .catch((error) => res.json({ message: error }));
 });
+
+//Obtener todos los libros
+router.get("/inventario/todos", (req, res) => {
+    inventarioSchema.find()
+        .then((data) => res.json(data))
+        .catch((error) => res.json({ message: error }));
+});
 //Método para obtener libro por Nombre del libro o Autor (Admin)
 router.get("/inventario/buscar", verifyAdmin, verifyToken, async (req, res) => {
     const { nombre, autor } = req.query; // Usamos query params para que pueda buscar por ambos campos
@@ -56,7 +63,7 @@ router.post("/inventario", verifyAdmin, verifyToken, async (req, res) => {
         // Verificamos si el libro con el mismo ISBN o nombre ya existe
         const libroExistente = await inventarioSchema.findOne({ $or: [{ isbn }, { nombre }] });
 
-        if (libroExistente) {
+        if (!libroExistente) {
             return res.status(400).json({ message: "El libro ya existe en el inventario." });
         }
 
