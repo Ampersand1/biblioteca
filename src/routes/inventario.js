@@ -5,7 +5,7 @@ const inventario = require("../models/inventario");
 const { verifyToken, verifyAdmin } = require('./authorization');
 
 // Método para obtener todos los libros -SOLO PARA EL DESARROLLO-
-router.get("/inventario",verifyAdmin, verifyToken, (req, res) => {
+router.get("/inventario", (req, res) => {
     inventarioSchema.find()
         .then((data) => res.json(data))
         .catch((error) => res.json({ message: error }));
