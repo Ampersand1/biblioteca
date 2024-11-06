@@ -1,4 +1,4 @@
-import { verify } from 'jsonwebtoken'
+const { verify } = require('jsonwebtoken');
 //función para verificar que el token sea válido
 //y si el usuario tiene permiso para acceder
 //En el servidor se va a recibir así:
@@ -33,4 +33,4 @@ const verifyAdmin = (req, res, next) => {
     }
 };
 
-export default {verifyToken, verifyAdmin};
+module.exports = { verifyToken, verifyAdmin };
