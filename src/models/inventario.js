@@ -10,7 +10,7 @@ const inventarioSchema = new mongoose.Schema({
     },
     GeneroSecundario: {
         type: String,
-        required: true
+        required: false
     },
     Autor: { 
         type: String, 
@@ -18,7 +18,7 @@ const inventarioSchema = new mongoose.Schema({
     },
     AñoPubli:{
         type: Date,
-        required: true
+        required: false
     },
     Editorial:{
         type: String,
