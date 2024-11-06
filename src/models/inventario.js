@@ -28,14 +28,14 @@ const inventarioSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    cantidad: {
+    cantidadDisponible: {
         type: Number, 
         required: true,
         default: 1
     }, 
     reservado: [{
         type: mongoose.Schema.Types.ObjectId, 
-        ref: "Usuario"  // Suponiendo que tienes un modelo de "Usuario"
+        ref: "Usuario"  
     }]
     
 });

@@ -19,7 +19,7 @@ async function verificarCantidadReservados(usuarioId) {
 
 async function libroNoReservado(){
     try{
-        const cantidadDisponible = inventario.find({cantidad});
+        const cantidadDisponible = inventario.find({cantidadDisponible});
             return cantidadDisponible > 0
     }catch{
         throw new Error("Error al verificar si el libro esta disponible para la reserva.");
@@ -67,7 +67,7 @@ router.post("/reservas/:inventarioId", verifyToken, async (req, res) => {
             // Decrementar la cantidad en inventario
             await Inventario.findByIdAndUpdate(
                 inventarioId,
-                { $inc: { cantidad: -1 } }, // Decrecer la cantidad en 1
+                { $inc: { cantidadDisponible: -1 } }, // Decrecer la cantidad en 1
                 { new: true }
             );
 
