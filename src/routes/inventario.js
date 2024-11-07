@@ -57,21 +57,30 @@ router.get("/inventario/buscar", verifyToken, async (req, res) => {
 });
 //Nuevo Libro
 router.post("/inventario", verifyAdmin, verifyToken, async (req, res) => {
-    const { nombre, isbn } = req.body;  // Asumimos que el libro tiene un 'nombre' o 'isbn' para verificar duplicados
+    const { Nombre, GeneroPrincipal, GeneroSecundario, Autor, AñoPubli, Editorial, ISBN, cantidadDisponible } = req.body;
 
     try {
         // Verificamos si el libro con el mismo ISBN o nombre ya existe
-        const libroExistente = await inventarioSchema.findOne({ $or: [{ isbn }, { nombre }] });
+        const libroExistente = await inventarioSchema.findOne({ $or: [{ ISBN }, { Nombre }] });
 
-        if (!libroExistente) {
+        if (libroExistente) {
             return res.status(400).json({ message: "El libro ya existe en el inventario." });
         }
 
-        // Si el libro no existe, lo guardamos
-        const inventario = new inventarioSchema(req.body);
+        // Si el libro no existe, lo creamos
+        const inventario = new inventarioSchema({
+            Nombre,
+            GeneroPrincipal,
+            GeneroSecundario,
+            Autor,
+            AñoPubli,
+            Editorial,
+            ISBN,
+            cantidadDisponible: cantidadDisponible || 1 // Utiliza el valor proporcionado o el valor por defecto
+        });
+
         const nuevoLibro = await inventario.save();
         res.status(201).json(nuevoLibro);
-
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
