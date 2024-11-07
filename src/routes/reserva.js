@@ -3,7 +3,6 @@ const router = express.Router();
 const Reserva = require("../models/reserva");
 const Inventario = require("../models/inventario");
 const { verifyToken, verifyAdmin } = require('./authorization');
-const inventario = require("../models/inventario");
 
 //Obtener todas las reservas solo para el desarrollo
 router.get("/reservas/todas", (req, res) => {
@@ -171,29 +170,29 @@ router.delete("/reservas/:id", verifyToken, async (req, res) => {
 });
 
 // 3. Ver todas las reservas (para el administrador)
+// Mostrar lista de libros reservados con su usuario respectivo
 router.get("/reservas", verifyAdmin, verifyToken, async (req, res) => {
     try {
-        const reservas = await Reserva.find()
-            .populate('usuario', 'nombre') // Poblamos el nombre del usuario
-            .populate('libros', 'Nombre') // Poblamos el nombre del libro desde el esquema Inventario
+        // Buscar los libros en el inventario, solo los que tienen reservas
+        const libros = await Inventario.find({ reservado: { $ne: [] } }) // Solo los libros con reservas
+            .populate('reservado', 'nombre') // Poblar el campo 'reservado' con el nombre del usuario
             .exec();
 
-        const reservasConDetalles = reservas.map(reserva => {
-            const tiempoRestante = reserva.calcularTiempoRestante();
+        const librosConUsuariosReservados = libros.map(libro => {
+            // Mapear para devolver el resultado en el formato correcto
             return {
-                id: reserva._id,
-                usuario: reserva.usuario.nombre, // Nombre del usuario
-                libro: reserva.libros[0] ? reserva.libros[0].Nombre : null, // Nombre del libro
-                tiempoRestante: tiempoRestante, // Tiempo restante de la reserva
-                estado: reserva.reservaCumplida ? "Cumplida" : "No cumplida" // Estado de la reserva
+                Nombre: libro.Nombre,
+                Autor: libro.Autor,
+                ISBN: libro.ISBN,
+                UsuariosReservados: libro.reservado.map(usuario => usuario._id) // Mostrar solo el ID del usuario
             };
         });
-        res.status(200).json(reservasConDetalles);
+
+        res.status(200).json(librosConUsuariosReservados);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 });
-
 
 // 4. Marcar una reserva como cumplida
 router.patch("/reservas/:id/cumplida", verifyAdmin, verifyToken, async (req, res) => {
