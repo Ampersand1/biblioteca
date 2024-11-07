@@ -88,17 +88,16 @@ router.post("/inventario", verifyAdmin, verifyToken, async (req, res) => {
 
 // Método para cambiar información de la referencia
 router.put("/inventario/:id", verifyAdmin, verifyToken, async (req, res) => {
-    const { id } = req.params; // Obtener el ID desde los parámetros de la URL
-    const { Nombre, GeneroPrincipal, GeneroSecundario, Autor, AñoPubli, Editorial, ISBN } = req.body;
+    const { id } = req.params;
+    const { Nombre, GeneroPrincipal, GeneroSecundario, Autor, AñoPubli, Editorial, ISBN, cantidadDisponible } = req.body;
 
     try {
-        // Buscamos el libro en el inventario por su id
         const inventario = await inventarioSchema.findById(id);
         if (!inventario) {
             return res.status(404).json({ error: "Referencia no encontrada" });
         }
 
-        // Actualizamos los campos solo si se envían en la solicitud
+        // Actualiza los campos solo si están presentes en el body
         if (Nombre) inventario.Nombre = Nombre;
         if (GeneroPrincipal) inventario.GeneroPrincipal = GeneroPrincipal;
         if (GeneroSecundario) inventario.GeneroSecundario = GeneroSecundario;
@@ -106,12 +105,12 @@ router.put("/inventario/:id", verifyAdmin, verifyToken, async (req, res) => {
         if (AñoPubli) inventario.AñoPubli = AñoPubli;
         if (Editorial) inventario.Editorial = Editorial;
         if (ISBN) inventario.ISBN = ISBN;
+        if (cantidadDisponible !== undefined) inventario.cantidadDisponible = cantidadDisponible;
 
-        // Guardamos los cambios en la base de datos
         await inventario.save();
         res.json({ message: "Datos del libro en el inventario actualizados con éxito", inventario });
     } catch (error) {
-        console.error(error); // Log para ver el error en la consola
+        console.error(error);
         res.status(500).json({ error: "Error al actualizar el inventario" });
     }
 });
