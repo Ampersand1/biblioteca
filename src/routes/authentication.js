@@ -37,14 +37,10 @@ router.post('/signup', async (req, res) => {
 
         await user.save();
 
-        const token = jwt.sign({ id: user._id, rol: user.rol }, process.env.SECRET, {
-            expiresIn: 60 * 60 * 24, // un día en segundos
-        });
 
         return res.json({
             message: "Usuario registrado con éxito",
             auth: true,
-            token,
             user
         });
     } catch (error) {
@@ -92,14 +88,9 @@ router.post('/signupadmin', async (req, res) => {
 
         await user.save();
 
-        const token = jwt.sign({ id: user._id, rol: user.rol }, process.env.SECRET, {
-            expiresIn: 60 * 60 * 24, // un día en segundos
-        });
-
         return res.json({
             message: "Administrador registrado con éxito",
             auth: true,
-            token,
             user
         });
     } catch (error) {
