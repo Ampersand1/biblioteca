@@ -12,12 +12,20 @@ READSPACE es una aplicación web donde los usuarios pueden buscar los libros dis
 
 ## Instalación y Configuración
 ### Requisitos Previos
-- Node.js
-- MongoDB
+- Node.js (descargar entorno de ejecución)
+- MongoDB (cuenta en la página oficial)
 - Poner el resto de requisitos previos si aplica!!!
 ### Instalación
-git clone https://github.com/Ampersand1/biblioteca.git
-- Poner el resto de comandos para instalación de la aplicación!!!
+- git clone https://github.com/Ampersand1/biblioteca.git
+- npm init --yes (terminal Visual Studio code)
+- node index.js (terminal Visual Studio code)
+- npm install express --save (terminal Visual Studio code)
+- npm i –D nodemon (terminal Visual Studio code)
+- npm run dev (terminal Visual Studio code)
+- npm i mongoose --save (terminal Visual Studio code)
+- npm i dotenv --save (terminal Visual Studio code)
+- npm i bcrypt --save (terminal Visual Studio code)
+- npm i jsonwebtoken --save (terminal Visual Studio code)
 
 ## Ejecución del Proyecto
 - Poner los comandos y pasos para la ejecución del proyecto.!!!!!
@@ -45,9 +53,10 @@ git clone https://github.com/Ampersand1/biblioteca.git
 ## Rutas de la API
 ### Autenticación y cuentas
 - POST /signup - Registrar nuevo usuario
-- POST /signup - Registrar nuevo admin
+- POST /signupadmin - Registrar nuevo admin
 - POST /login - Iniciar sesión
-- poner el resto de endpoints que le competen a la gestión de cuentas (como eliminar o actualizar una cuenta)
+- PUT /usuarios - Modificar cuenta propia (actualizar datos de la cuenta)
+- DELETE /usuarios - Borrar cuenta propia
 ### Usuarios
 Estas son las funcionalidades que tienen las cuentas de usuarios:
 - LOS SIGUIENTES SON EJEMPLOS: (LLENAR CUANDO YA ESTEN LOS ENDPOINTS QUE USARÁN LOS USUARIOS COMPLETOS)
