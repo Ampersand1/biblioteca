@@ -7,9 +7,8 @@ const { verifyToken, verifyAdmin } = require('./authorization');
 //Obtener todas las reservas solo para el desarrollo
 router.get("/reservas/todas", (req, res) => {
     Reserva.find()
-        .then((data) => res.json(data))
-        .catch((error) => res.json({ message: error }));
-        res.json(data)
+        .then((data) => res.json(data)) // Envía la respuesta con los datos encontrados
+        .catch((error) => res.json({ message: error })); // Maneja errores
 });
 // Función para verificar la cantidad de reservas activas de un usuario (máximo 2)
 async function verificarCantidadReservados(usuarioId) {
@@ -71,27 +70,21 @@ router.post("/reservas/:inventarioId", verifyToken, async (req, res) => {
         });
 
         // Guardar la reserva en la base de datos
-        await nuevaReserva.save();
+        const reservaGuardada = await nuevaReserva.save();
 
         // Actualizar la cantidad de ejemplares disponibles
         try {
-            // Obtener el libro actual y decrementar la cantidad disponible manualmente
             const libro = await Inventario.findById(inventarioId);
             if (libro && libro.cantidadDisponible > 0) {
-                // Restar uno a la cantidad disponible
                 const nuevaCantidad = libro.cantidadDisponible - 1;
 
-                // Actualizar el inventario con la nueva cantidad
+                // Actualizar el inventario con la nueva cantidad y agregar el usuario al campo 'reservado'
                 await Inventario.findByIdAndUpdate(
                     inventarioId,
-                    { $set: { cantidadDisponible: nuevaCantidad } }, // Establecer la nueva cantidad
-                    { new: true }
-                );
-
-                // Agregar el usuario al campo 'reservado' del libro
-                await Inventario.findByIdAndUpdate(
-                    inventarioId,
-                    { $push: { reservado: usuarioId } }, // Agregar el ID del usuario al arreglo de 'reservado'
+                    {
+                        $set: { cantidadDisponible: nuevaCantidad },
+                        $push: { reservado: usuarioId }
+                    },
                     { new: true }
                 );
             } else {
@@ -101,11 +94,11 @@ router.post("/reservas/:inventarioId", verifyToken, async (req, res) => {
             return res.status(500).json({ message: "No se pudo actualizar el inventario. Error interno.", error: error.message });
         }
 
-
-        // Responder con la información del libro reservado y el mensaje de éxito
+        // Responder con el ID de la reserva y los detalles del libro reservado
         res.status(201).json({
             message: "Reserva creada con éxito.",
             reserva: {
+                id: reservaGuardada._id, // Incluir el ID de la reserva
                 usuario: usuarioId,
                 libro: {
                     Nombre: articulo.Nombre,
@@ -122,6 +115,7 @@ router.post("/reservas/:inventarioId", verifyToken, async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 });
+
 
 // 2. Eliminar una reserva según su ID
 router.delete("/reservas/:id", verifyToken, async (req, res) => {
@@ -177,6 +171,11 @@ router.get("/reservas", verifyAdmin, verifyToken, async (req, res) => {
         const libros = await Inventario.find({ reservado: { $ne: [] } }) // Solo los libros con reservas
             .populate('reservado', 'nombre') // Poblar el campo 'reservado' con el nombre del usuario
             .exec();
+
+        // Verificar si no hay libros con reservas
+        if (libros.length === 0) {
+            return res.status(404).json({ message: "En este momento no hay reservas activas." });
+        }
 
         const librosConUsuariosReservados = libros.map(libro => {
             // Mapear para devolver el resultado en el formato correcto
