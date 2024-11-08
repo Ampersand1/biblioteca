@@ -11,24 +11,20 @@ READSPACE es una aplicación web donde los usuarios pueden buscar los libros dis
 - [Licencia](#licencia)
 
 ## Instalación y Configuración
-### Requisitos Previos
-- Node.js (descargar entorno de ejecución)
-- MongoDB (cuenta en la página oficial)
-- Poner el resto de requisitos previos si aplica!!!
+
 ### Instalación
 - git clone https://github.com/Ampersand1/biblioteca.git
 - npm init --yes (terminal Visual Studio code)
 - node index.js (terminal Visual Studio code)
 - npm install express --save (terminal Visual Studio code)
 - npm i –D nodemon (terminal Visual Studio code)
-- npm run dev (terminal Visual Studio code)
 - npm i mongoose --save (terminal Visual Studio code)
 - npm i dotenv --save (terminal Visual Studio code)
 - npm i bcrypt --save (terminal Visual Studio code)
 - npm i jsonwebtoken --save (terminal Visual Studio code)
 
 ## Ejecución del Proyecto
-- Poner los comandos y pasos para la ejecución del proyecto.!!!!!
+- npm run dev (terminal Visual Studio code)
 
 ## Estructura del Proyecto
 - Poner lo que haga falta!!!
