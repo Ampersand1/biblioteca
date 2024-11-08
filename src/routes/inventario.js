@@ -36,25 +36,44 @@ router.get("/inventario/buscar", verifyAdmin, verifyToken, async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 });
-//Método para obtener libro por Nombre del libro o Autor (Usuario)
-router.get("/inventario/buscar", verifyToken, async (req, res) => {
-    const { nombre, autor } = req.query; // Usamos query params para que pueda buscar por ambos campos
+// Método para obtener libro por Nombre del libro o Autor (Usuario)
+router.get("/inventario/buscar", async (req, res) => {
+    const { nombre, autor } = req.query;
 
     try {
-        // Buscamos en la base de datos por 'nombre' o 'autor' 
         const inventario = await inventarioSchema.findOne({
             $or: [{ Nombre: nombre }, { Autor: autor }]
         });
 
         if (!inventario) {
-            return res.status(404).json({ message: "Libro u articulo no encontrado" });
+            return res.status(404).json({ message: "Libro u artículo no encontrado" });
         }
 
-        res.json(inventario);
+        console.log('Cantidad disponible:', inventario.cantidadDisponible); // Depuración
+
+        if (inventario.cantidadDisponible === 0) {
+            return res.status(200).json({
+                message: "El libro existe en la biblioteca, pero actualmente no está disponible."
+            });
+        }
+
+        return res.status(200).json({
+            message: "Libro disponible.",
+            libro: {
+                Nombre: inventario.Nombre,
+                Autor: inventario.Autor,
+                GeneroPrincipal: inventario.GeneroPrincipal,
+                AñoPubli: inventario.AñoPubli || "No especificado",
+                Editorial: inventario.Editorial,
+                ISBN: inventario.ISBN,
+                cantidadDisponible: inventario.cantidadDisponible
+            }
+        });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        return res.status(500).json({ message: error.message });
     }
 });
+
 //Nuevo Libro
 router.post("/inventario", verifyAdmin, verifyToken, async (req, res) => {
     const { Nombre, GeneroPrincipal, GeneroSecundario, Autor, AñoPubli, Editorial, ISBN, cantidadDisponible } = req.body;
