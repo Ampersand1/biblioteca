@@ -30,15 +30,15 @@ READSPACE es una aplicación web donde los usuarios pueden buscar los libros dis
 
 ## Estructura del Proyecto
 
-###src/ - modelos y rutas de la API
+### src/ - modelos y rutas de la API
 
-###src/routes/ - Define las rutas de la API
+### src/routes/ - Define las rutas de la API
 - routes/authentication.js - Métodos de autenticación de los usuarios de la aplicación (Usuarios, Admins)
 - routes/authorization.js - Métodos de validación de permisos de los usuarios (Usuarios, Admins)
 - routes/inventario.js - Métodos de CRUD de inventario de libros (POST, GET, PUT, DELETE)
 - routes/reserva.js - Métodos de CRUD de reserva de libros (POST, GET, PATCH, DELETE)
 - routes/usuario.js - Métodos de CRUD de usuarios (POST, GET, PUT, DELETE)
-###src/models/ - Contiene los esquemas de MongoDB para Usuarios y Libros
+### src/models/ - Contiene los esquemas de MongoDB para Usuarios y Libros
 - models/inventario.js - Declaración de variables requeridas para el CRUD de inventario y para exportar a los campos de la base de datos 
 - models/reserva.js - Declaración de variables requeridas para el CRUD de reserva y para exportar a los campos de la base de datos 
 - models/usuario.js - Declaración de variables requeridas para el CRUD de usuarios y para exportar a los campos de la base de datos 
