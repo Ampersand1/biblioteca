@@ -5,13 +5,6 @@ const Inventario = require("../models/inventario");
 const { verifyToken, verifyAdmin } = require('./authorization');
 const inventario = require("../models/inventario");
 
-//Obtener todas las reservas solo para el desarrollo
-router.get("/reservas/todas", (req, res) => {
-    Reserva.find()
-        .then((data) => res.json(data))
-        .catch((error) => res.json({ message: error }));
-        res.json(data)
-});
 // Función para verificar la cantidad de reservas activas de un usuario (máximo 2)
 async function verificarCantidadReservados(usuarioId) {
     try {
