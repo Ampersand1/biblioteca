@@ -37,30 +37,32 @@ router.get("/inventario/buscar/admin", verifyAdmin, verifyToken, async (req, res
     }
 });
 //Método para obtener libro por Nombre del libro o Autor (Usuario)
+//Método para obtener libro por Nombre del libro o Autor (Usuario)
+//Método para obtener libro por Nombre del libro o Autor (Usuario)
 router.get("/inventario/buscar", async (req, res) => {
-    const { nombre, autor } = req.query;  // Extraemos los parámetros de búsqueda
+    const { query } = req.query;  // Extraemos el parámetro de búsqueda
 
-    // Validación de los parámetros
-    if (!nombre && !autor) {
-        return res.status(400).json({ message: "Debe proporcionar al menos un parámetro de búsqueda (nombre o autor)." });
+    // Validación del parámetro
+    if (!query) {
+        return res.status(400).json({ message: "Debe proporcionar un término de búsqueda." });
     }
 
     try {
-        // Creamos la búsqueda solo si el parámetro existe
-        const query = {};
+        let queryObj = {};
 
-        if (nombre) {
-            query.Nombre = { $regex: nombre, $options: 'i' };  // 'i' para insensibilidad a mayúsculas/minúsculas
+        // Si el término de búsqueda está presente, se busca tanto en nombre como en autor
+        if (query) {
+            queryObj = {
+                $or: [
+                    { Nombre: { $regex: query, $options: 'i' } },
+                    { Autor: { $regex: query, $options: 'i' } }
+                ]
+            };
         }
 
-        if (autor) {
-            query.Autor = { $regex: autor, $options: 'i' };
-        }
+        const libros = await inventarioSchema.find(queryObj).limit(10);
 
-        // Realizamos la búsqueda en la base de datos
-        const libros = await inventarioSchema.find(query).limit(10);  // Limitar los resultados a 10 libros
-
-        if (!libros.length) {
+        if (libros.length === 0) {
             return res.status(404).json({ message: "No se encontraron libros." });
         }
 
@@ -69,7 +71,6 @@ router.get("/inventario/buscar", async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 });
-
 
 //Nuevo Libro
 router.post("/inventario", verifyAdmin, verifyToken, async (req, res) => {
