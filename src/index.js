@@ -6,6 +6,7 @@ const authRoutes = require("./routes/authentication");
 const usuarioRoutes = require("./routes/usuario");
 const reservaRoutes = require("./routes/reserva");
 const inventarioRoutes = require("./routes/inventario");
+<<<<<<< HEAD
 const cors = require('cors'); // Importa el paquete cors
 const mongoose = require("mongoose");
 require('dotenv').config();
@@ -13,6 +14,12 @@ require('dotenv').config();
 // Habilita CORS para todas las rutas
 app.use(cors())
 
+=======
+const cors = require('cors');
+const mongoose = require("mongoose");
+require('dotenv').config();
+app.use(cors());
+>>>>>>> origin/main
 app.use(parser.urlencoded({ extended: false }));
 app.use(parser.json());
 app.use("/api", authRoutes);
