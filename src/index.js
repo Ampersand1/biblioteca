@@ -12,9 +12,9 @@ require('dotenv').config();
 
 // Habilitar CORS
 app.use(cors({
-    origin: 'http://localhost:4200',  // Permitir solicitudes solo desde tu frontend (Angular en localhost:4200)
+    origin: '*',  // Permitir solicitudes solo desde tu frontend (Angular en localhost:4200)
     methods: ['GET', 'POST', 'PUT', 'DELETE'],        // Métodos permitidos
-    allowedHeaders: ['Content-Type', 'Authorization'],  // Headers permitidos
+    allowedHeaders: ['Content-Type', 'Authorization']  // Headers permitidos
 }));
 
 app.use(parser.urlencoded({ extended: false }));

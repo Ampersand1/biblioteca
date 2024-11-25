@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken')
 //access-token
 //Middleware verifyToken
 const verifyToken = (req, res, next) => {
-    const token = req.header('access-token')
+    const token = req.headers['authorization']?.split(' ')[1];
     if (!token) return res.status(401).json({ error: '¡Lo sentimos!, pero no tiene permisos para acceder a esta ruta.' })
     try {
         const verified = jwt.verify(token, process.env.SECRET)
@@ -18,7 +18,7 @@ const verifyToken = (req, res, next) => {
 
 // Middleware verifyAdmin para verificar el rol de administrador
 const verifyAdmin = (req, res, next) => {
-    const token = req.header('access-token');
+    const token = req.headers['authorization']?.split(' ')[1];
     if (!token) return res.status(401).json({ error: 'No tiene permisos para acceder a esta ruta' });
 
     try {
@@ -33,4 +33,4 @@ const verifyAdmin = (req, res, next) => {
     }
 };
 
-module.exports = {verifyToken, verifyAdmin};
+module.exports = { verifyToken, verifyAdmin };
