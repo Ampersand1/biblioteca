@@ -6,9 +6,10 @@ const authRoutes = require("./routes/authentication");
 const usuarioRoutes = require("./routes/usuario");
 const reservaRoutes = require("./routes/reserva");
 const inventarioRoutes = require("./routes/inventario");
+const cors = require('cors');
 const mongoose = require("mongoose");
 require('dotenv').config();
-
+app.use(cors());
 app.use(parser.urlencoded({ extended: false }));
 app.use(parser.json());
 app.use("/api", authRoutes);
