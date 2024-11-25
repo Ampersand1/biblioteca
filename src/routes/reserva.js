@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Reserva = require("../models/reserva");
+const Usuario = require("../models/usuario");
 const Inventario = require("../models/inventario");
 const { verifyToken, verifyAdmin } = require('./authorization');
 const inventario = require("../models/inventario");
@@ -204,5 +205,75 @@ router.patch("/reservas/:id/cumplida", verifyAdmin, verifyToken, async (req, res
         res.status(500).json({ message: error.message });
     }
 });
+
+// 5. Ver reservas según el nombre del usuario
+router.get("/reservas/usuario/:nombreUsuario", verifyAdmin, verifyToken, async (req, res) => {
+    try {
+        const { nombreUsuario } = req.params; // Obtener el nombre de usuario desde los parámetros de la ruta
+
+        // Buscar el usuario con el nombre especificado
+        const user = await Usuario.findOne({ usuario: nombreUsuario }); // Cambié "usuario" por "user" para evitar conflictos
+        if (!user) {
+            return res.status(404).json({ message: `No se encontró el usuario con el nombre ${nombreUsuario}.` });
+        }
+
+        // Buscar las reservas relacionadas con este usuario
+        const reservas = await Reserva.find({ usuario: user._id })
+            .populate('usuario', 'usuario') // Poblamos el nombre del usuario
+            .populate('libros', 'Nombre') // Poblamos el nombre del libro
+            .exec();
+
+        // Verificar si hay reservas encontradas
+        if (reservas.length === 0) {
+            return res.status(404).json({ message: `No se encontraron reservas para el usuario ${nombreUsuario}.` });
+        }
+
+        // Mapear las reservas para incluir solo la información relevante
+        const reservasConDetalles = reservas.map(reserva => ({
+            id: reserva._id,
+            usuario: reserva.usuario.usuario, // Nombre del usuario
+            libro: reserva.libros[0] ? reserva.libros[0].Nombre : null, // Nombre del libro
+            tiempoRestante: reserva.calcularTiempoRestante(),
+            estado: reserva.reservaCumplida ? "Cumplida" : "No cumplida" // Estado de la reserva
+        }));
+
+        // Responder con las reservas encontradas
+        res.status(200).json(reservasConDetalles);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+// 6. Obtener "mis" reservas
+router.get("/reservas/mis-reservas", verifyToken, async (req, res) => {
+    try {
+        const usuarioId = req.user.id; // Obtener el ID del usuario desde el token JWT
+
+        // Buscar las reservas relacionadas con este usuario
+        const reservas = await Reserva.find({ usuario: usuarioId })
+            .populate('usuario', 'usuario') // Poblamos el nombre del usuario
+            .populate('libros', 'Nombre') // Poblamos el nombre del libro
+            .exec();
+
+        // Verificar si hay reservas encontradas
+        if (reservas.length === 0) {
+            return res.status(404).json({ message: `No se encontraron reservas para el usuario con ID ${usuarioId}.` });
+        }
+
+        // Mapear las reservas para incluir solo la información relevante
+        const reservasConDetalles = reservas.map(reserva => ({
+            id: reserva._id,
+            usuario: reserva.usuario.usuario, // Nombre del usuario
+            libro: reserva.libros[0] ? reserva.libros[0].Nombre : null, // Nombre del libro
+            tiempoRestante: reserva.calcularTiempoRestante(),
+            estado: reserva.reservaCumplida ? "Cumplida" : "No cumplida" // Estado de la reserva
+        }));
+
+        // Responder con las reservas encontradas
+        res.status(200).json(reservasConDetalles);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 
 module.exports = router;
