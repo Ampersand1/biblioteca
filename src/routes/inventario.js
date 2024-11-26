@@ -111,7 +111,7 @@ router.post('/inventario', verifyToken, verifyAdmin, async (req, res) => {
 // Método para cambiar información de la referencia
 router.put("/inventario/:id", verifyAdmin, verifyToken, async (req, res) => {
     const { id } = req.params; // Obtener el ID desde los parámetros de la URL
-    const { Nombre, GeneroPrincipal, GeneroSecundario, Autor, AñoPubli, Editorial, ISBN, imagen } = req.body;
+    const { Nombre, GeneroPrincipal, GeneroSecundario, Autor, AñoPubli, Editorial, ISBN, imagen, cantidadDisponible } = req.body;
 
     try {
         // Buscamos el libro en el inventario por su id
@@ -129,6 +129,7 @@ router.put("/inventario/:id", verifyAdmin, verifyToken, async (req, res) => {
         if (Editorial) inventario.Editorial = Editorial;
         if (ISBN) inventario.ISBN = ISBN;
         if (imagen) inventario.imagen = imagen;
+        if (cantidadDisponible) inventario.cantidadDisponible = cantidadDisponible;
 
         // Guardamos los cambios en la base de datos
         await inventario.save();
