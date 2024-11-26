@@ -18,7 +18,7 @@ router.get("/inventario/todos", (req, res) => {
         .catch((error) => res.json({ message: error }));
 });
 //Método para obtener libro por Nombre del libro o Autor (Admin)
-router.get("/inventario/buscar", verifyAdmin, verifyToken, async (req, res) => {
+router.get("/inventario/buscar/admin", verifyAdmin, verifyToken, async (req, res) => {
     const { nombre, autor } = req.query; // Usamos query params para que pueda buscar por ambos campos
 
     try {
@@ -37,41 +37,71 @@ router.get("/inventario/buscar", verifyAdmin, verifyToken, async (req, res) => {
     }
 });
 //Método para obtener libro por Nombre del libro o Autor (Usuario)
-router.get("/inventario/buscar", verifyToken, async (req, res) => {
-    const { nombre, autor } = req.query; // Usamos query params para que pueda buscar por ambos campos
+router.get("/inventario/buscar", async (req, res) => {
+    const { query } = req.query;  // Extraemos el parámetro de búsqueda
+
+    // Validación del parámetro
+    if (!query) {
+        return res.status(400).json({ message: "Debe proporcionar un término de búsqueda." });
+    }
 
     try {
-        // Buscamos en la base de datos por 'nombre' o 'autor' 
-        const inventario = await inventarioSchema.findOne({
-            $or: [{ Nombre: nombre }, { Autor: autor }]
-        });
+        let queryObj = {};
 
-        if (!inventario) {
-            return res.status(404).json({ message: "Libro u articulo no encontrado" });
+        // Si el término de búsqueda está presente, se busca tanto en nombre como en autor
+        if (query) {
+            queryObj = {
+                $or: [
+                    { Nombre: { $regex: query, $options: 'i' } },
+                    { Autor: { $regex: query, $options: 'i' } }
+                ]
+            };
         }
 
-        res.json(inventario);
+        const libros = await inventarioSchema.find(queryObj).limit(10);
+
+        if (libros.length === 0) {
+            return res.status(404).json({ message: "No se encontraron libros." });
+        }
+
+        res.json(libros);  // Devolvemos los libros encontrados
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 });
+
 //Nuevo Libro
-router.post("/inventario", verifyAdmin, verifyToken, async (req, res) => {
-    const { nombre, isbn } = req.body;  // Asumimos que el libro tiene un 'nombre' o 'isbn' para verificar duplicados
+router.post('/inventario', verifyToken, verifyAdmin, async (req, res) => {
+    const { Nombre, Autor, ISBN, Editorial, Imagen, GeneroPrincipal, GeneroSecundario, AnoPubli, cantidadDisponible } = req.body;
 
     try {
-        // Verificamos si el libro con el mismo ISBN o nombre ya existe
-        const libroExistente = await inventarioSchema.findOne({ $or: [{ isbn }, { nombre }] });
+        // Verificar si ya existe un libro con el mismo ISBN o Nombre
+        const libroExistente = await inventarioSchema.findOne({
+            $or: [{ ISBN }, { Nombre }]
+        });
 
-        if (!libroExistente) {
-            return res.status(400).json({ message: "El libro ya existe en el inventario." });
+        if (libroExistente) {
+            return res.status(400).json({ message: 'El libro ya existe en el inventario.' });
         }
 
-        // Si el libro no existe, lo guardamos
-        const inventario = new inventarioSchema(req.body);
-        const nuevoLibro = await inventario.save();
-        res.status(201).json(nuevoLibro);
+        // Crear el nuevo libro
+        const nuevoLibro = new inventarioSchema({
+            Nombre,
+            Autor,
+            ISBN,
+            Editorial,
+            GeneroPrincipal,
+            GeneroSecundario,
+            AnoPubli,
+            cantidadDisponible,
+            Imagen
+        });
 
+        // Guardar el libro en la base de datos
+        await nuevoLibro.save();
+
+        // Responder con el nuevo libro
+        res.status(201).json(nuevoLibro);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
