@@ -81,6 +81,11 @@ router.delete("/usuarios", verifyToken, async (req, res) => {
     }
 });
 
+router.post("/logout", verifyToken, async (req, res) => {
+
+    res.status(200).json({ message: 'Se ha cerrado la sesión, hasta luego' });
+});
+
 //Método -SOLO PARA EL DESARROLLO- para obtener a TODOS los usuarios (NO USAR EN LA APP)
 router.get("/usuariostodos", async (req, res) => {
     try {
