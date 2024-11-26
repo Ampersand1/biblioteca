@@ -72,7 +72,7 @@ router.get("/inventario/buscar", async (req, res) => {
 
 //Nuevo Libro
 router.post('/inventario', verifyToken, verifyAdmin, async (req, res) => {
-    const { Nombre, Autor, ISBN, Editorial, Imagen, GeneroPrincipal, GeneroSecundario, AnoPubli, cantidadDisponible } = req.body;
+    const { Nombre, Autor, ISBN, Editorial, imagen, GeneroPrincipal, GeneroSecundario, AnoPubli, cantidadDisponible } = req.body;
 
     try {
         // Verificar si ya existe un libro con el mismo ISBN o Nombre
@@ -94,7 +94,7 @@ router.post('/inventario', verifyToken, verifyAdmin, async (req, res) => {
             GeneroSecundario,
             AnoPubli,
             cantidadDisponible,
-            Imagen
+            imagen
         });
 
         // Guardar el libro en la base de datos
@@ -106,6 +106,7 @@ router.post('/inventario', verifyToken, verifyAdmin, async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 });
+
 
 // Método para cambiar información de la referencia
 router.put("/inventario/:id", verifyAdmin, verifyToken, async (req, res) => {
