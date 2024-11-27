@@ -157,4 +157,18 @@ router.delete("/inventario/borrar/:id", async (req, res) => {
     }
 });
 
+// Obtener 3 libros al azar
+router.get("/inventario/random", async (req, res) => {
+    try {
+        const librosAleatorios = await inventarioSchema.aggregate([
+            { $sample: { size: 3 } } // Selecciona aleatoriamente 3 documentos
+        ]);
+
+        res.json(librosAleatorios);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+
 module.exports = router;
