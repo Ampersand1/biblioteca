@@ -6,6 +6,7 @@ const port = 3000;
 const authRoutes = require("./routes/authentication");
 const usuarioRoutes = require("./routes/usuario");
 const inventarioRoutes = require("./routes/inventario");
+const reservaRoutes = require("./routes/reserva");
 
 const mongoose = require("mongoose");
 require('dotenv').config();
@@ -22,6 +23,7 @@ app.use(parser.json());
 app.use("/api", authRoutes);
 app.use("/api", usuarioRoutes);
 app.use("/api", inventarioRoutes);
+app.use("/api", reservaRoutes);
 app.use(express.json());
 
 mongoose
