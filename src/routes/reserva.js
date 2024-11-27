@@ -171,26 +171,31 @@ router.delete("/reservas/:id", verifyToken, async (req, res) => {
 // 3. Ver todas las reservas (para el administrador)
 router.get("/reservas", verifyAdmin, verifyToken, async (req, res) => {
     try {
+        // Buscar todas las reservas y poblar la información del usuario y los libros
         const reservas = await Reserva.find()
-            .populate('usuario', 'nombre') // Poblamos el nombre del usuario
-            .populate('libros', 'Nombre') // Poblamos el nombre del libro desde el esquema Inventario
+            .populate("usuario", "usuario") // Solo traer el campo 'usuario' del modelo Usuario
+            .populate("libros", "Nombre") // Solo traer el campo 'Nombre' del modelo Inventario
             .exec();
 
+        // Procesar las reservas para devolver información detallada
         const reservasConDetalles = reservas.map(reserva => {
             const tiempoRestante = reserva.calcularTiempoRestante();
             return {
                 id: reserva._id,
-                usuario: reserva.usuario.nombre, // Nombre del usuario
-                libro: reserva.libros[0] ? reserva.libros[0].Nombre : null, // Nombre del libro
+                usuario: reserva.usuario?.usuario || "Usuario no encontrado", // Nombre del usuario o mensaje por defecto
+                libro: reserva.libros[0] ? reserva.libros[0].Nombre : null, // Nombre del primer libro de la reserva
                 tiempoRestante: tiempoRestante, // Tiempo restante de la reserva
                 estado: reserva.reservaCumplida ? "Cumplida" : "No cumplida" // Estado de la reserva
             };
         });
+
+        // Responder con las reservas detalladas
         res.status(200).json(reservasConDetalles);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 });
+
 
 
 // 4. Marcar una reserva como cumplida
