@@ -218,32 +218,38 @@ router.patch("/reservas/:id/cumplida", verifyAdmin, verifyToken, async (req, res
 // 5. Ver reservas según el nombre del usuario
 router.get("/reservas/usuario/:nombreUsuario", verifyAdmin, verifyToken, async (req, res) => {
     try {
-        const { nombreUsuario } = req.params; // Obtener el nombre de usuario desde los parámetros de la ruta
+        const { nombreUsuario } = req.params; // Obtener el término de búsqueda
 
-        // Buscar el usuario con el nombre especificado
-        const user = await Usuario.findOne({ usuario: nombreUsuario }); // Cambié "usuario" por "user" para evitar conflictos
-        if (!user) {
-            return res.status(404).json({ message: `No se encontró el usuario con el nombre ${nombreUsuario}.` });
+        // Usar una expresión regular para buscar coincidencias parciales e ignorar mayúsculas/minúsculas
+        const regex = new RegExp(nombreUsuario, "i"); // "i" para que no distinga entre mayúsculas y minúsculas
+
+        // Buscar usuarios cuyo nombre coincida parcial o completamente con la expresión regular
+        const usuarios = await Usuario.find({ usuario: { $regex: regex } }); 
+
+        if (usuarios.length === 0) {
+            return res.status(404).json({ message: `No se encontraron usuarios que coincidan con '${nombreUsuario}'.` });
         }
 
-        // Buscar las reservas relacionadas con este usuario
-        const reservas = await Reserva.find({ usuario: user._id })
-            .populate('usuario', 'usuario') // Poblamos el nombre del usuario
-            .populate('libros', 'Nombre') // Poblamos el nombre del libro
+        // Obtener los IDs de los usuarios encontrados
+        const usuariosIds = usuarios.map(user => user._id);
+
+        // Buscar reservas relacionadas con los usuarios encontrados
+        const reservas = await Reserva.find({ usuario: { $in: usuariosIds } })
+            .populate("usuario", "usuario") // Poblar el campo 'usuario' para obtener los nombres
+            .populate("libros", "Nombre") // Poblar el campo 'libros' para obtener los nombres de los libros
             .exec();
 
-        // Verificar si hay reservas encontradas
         if (reservas.length === 0) {
-            return res.status(404).json({ message: `No se encontraron reservas para el usuario ${nombreUsuario}.` });
+            return res.status(404).json({ message: `No se encontraron reservas para la búsqueda '${nombreUsuario}'.` });
         }
 
-        // Mapear las reservas para incluir solo la información relevante
+        // Mapear las reservas para mostrar detalles relevantes
         const reservasConDetalles = reservas.map(reserva => ({
             id: reserva._id,
-            usuario: reserva.usuario.usuario, // Nombre del usuario
-            libro: reserva.libros[0] ? reserva.libros[0].Nombre : null, // Nombre del libro
+            usuario: reserva.usuario?.usuario || "Usuario desconocido",
+            libro: reserva.libros[0] ? reserva.libros[0].Nombre : null,
             tiempoRestante: reserva.calcularTiempoRestante(),
-            estado: reserva.reservaCumplida ? "Cumplida" : "No cumplida" // Estado de la reserva
+            estado: reserva.reservaCumplida ? "Cumplida" : "No cumplida",
         }));
 
         // Responder con las reservas encontradas
@@ -252,6 +258,7 @@ router.get("/reservas/usuario/:nombreUsuario", verifyAdmin, verifyToken, async (
         res.status(500).json({ message: error.message });
     }
 });
+
 // 6. Obtener "mis" reservas
 router.get("/reservas/mis-reservas", verifyToken, async (req, res) => {
     try {
