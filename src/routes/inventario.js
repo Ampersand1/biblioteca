@@ -111,12 +111,13 @@ router.post('/inventario', verifyToken, verifyAdmin, async (req, res) => {
 // Método para cambiar información de la referencia
 router.put("/inventario/:id", verifyAdmin, verifyToken, async (req, res) => {
     const { id } = req.params; // Obtener el ID desde los parámetros de la URL
-    const { Nombre, GeneroPrincipal, GeneroSecundario, Autor, AñoPubli, Editorial, ISBN, imagen, cantidadDisponible } = req.body;
+    const { Nombre, GeneroPrincipal, GeneroSecundario, Autor, AnoPubli, Editorial, ISBN, imagen, cantidadDisponible } = req.body;
 
     try {
         // Buscamos el libro en el inventario por su id
         const inventario = await inventarioSchema.findById(id);
         if (!inventario) {
+            console.log("prueba de que no coge el libro")
             return res.status(404).json({ error: "Referencia no encontrada" });
         }
 
@@ -125,11 +126,13 @@ router.put("/inventario/:id", verifyAdmin, verifyToken, async (req, res) => {
         if (GeneroPrincipal) inventario.GeneroPrincipal = GeneroPrincipal;
         if (GeneroSecundario) inventario.GeneroSecundario = GeneroSecundario;
         if (Autor) inventario.Autor = Autor;
-        if (AñoPubli) inventario.AñoPubli = AñoPubli;
+        if (AnoPubli) inventario.AñoPubli = AnoPubli;
         if (Editorial) inventario.Editorial = Editorial;
         if (ISBN) inventario.ISBN = ISBN;
         if (imagen) inventario.imagen = imagen;
         if (cantidadDisponible) inventario.cantidadDisponible = cantidadDisponible;
+
+        console.log("prueba de que los datos llegan")
 
         // Guardamos los cambios en la base de datos
         await inventario.save();
@@ -141,7 +144,7 @@ router.put("/inventario/:id", verifyAdmin, verifyToken, async (req, res) => {
 });
 
 // Método -SOLO DESARROLLO- para borrar a un libro por su ID 
-router.delete("/inventario/borrar/:id", async (req, res) => {
+router.delete("/inventario/:id", async (req, res) => {
     const { id } = req.params;
 
     try {
