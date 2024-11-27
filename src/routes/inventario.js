@@ -144,7 +144,7 @@ router.put("/inventario/:id", verifyAdmin, verifyToken, async (req, res) => {
 });
 
 // Método -SOLO DESARROLLO- para borrar a un libro por su ID 
-router.delete("/inventario/borrar/:id", async (req, res) => {
+router.delete("/inventario/:id", async (req, res) => {
     const { id } = req.params;
 
     try {
