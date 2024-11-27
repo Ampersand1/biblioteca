@@ -160,11 +160,11 @@ router.delete("/inventario/:id", async (req, res) => {
     }
 });
 
-// Obtener 3 libros al azar
+// Obtener 4 libros al azar
 router.get("/inventario/random", async (req, res) => {
     try {
         const librosAleatorios = await inventarioSchema.aggregate([
-            { $sample: { size: 3 } } // Selecciona aleatoriamente 3 documentos
+            { $sample: { size: 4 } } // Selecciona aleatoriamente 3 documentos
         ]);
 
         res.json(librosAleatorios);

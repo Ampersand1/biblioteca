@@ -155,6 +155,6 @@ router.delete("/usuarios/borrar/:id", async (req, res) => {
         res.status(500).json({ error: "Error al eliminar el usuario" });
     }
 });
-
-
+  
+  
 module.exports = router;

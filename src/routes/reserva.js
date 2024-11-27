@@ -10,7 +10,7 @@ const inventario = require("../models/inventario");
 async function verificarCantidadReservados(usuarioId) {
     try {
         const reservasActivas = await Reserva.countDocuments({ usuario: usuarioId, reservaCumplida: false });
-        return reservasActivas < 3;
+        return reservasActivas < 2;
     } catch (error) {
         throw new Error("Error al verificar la cantidad de libros reservados.");
     }
