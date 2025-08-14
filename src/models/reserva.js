@@ -6,6 +6,7 @@ const reservaSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Usuario",  // Ref a Usuario
         required: true
+        
     },
     //libros de la reserva elegidos por el usuario
     libros: [{
