@@ -6,7 +6,7 @@ const reservaSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Usuario",  // Ref a Usuario
         required: true
-        
+
     },
     //libros de la reserva elegidos por el usuario
     libros: [{
@@ -28,6 +28,11 @@ const reservaSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
         required: true
+    },
+    nombre: {
+        type: String,
+        default: "eres gay",
+        required: false
     }
 });
 reservaSchema.methods.calcularTiempoRestante = function() {
